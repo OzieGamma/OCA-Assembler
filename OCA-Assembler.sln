@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCA-Assembler", "src\OCA-Assembler.csproj", "{87E36563-7067-44E8-AA51-E5CD1A036AB8}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OCA-Assembler.Test", "test\OCA-Assembler.Test.fsproj", "{F8F78C36-9B81-4F06-AD8A-5CC6D5F01B6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B96FECEE-353C-4138-937E-FA96D405B073}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		build.cmd = build.cmd
+		build.fsx = build.fsx
+		LICENSE = LICENSE
+		paket.dependencies = paket.dependencies
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OCA-AsmLib", "..\OCA-AsmLib\src\OCA-AsmLib.fsproj", "{6EBCD670-04E4-4A7D-A75F-95A12CEDB323}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87E36563-7067-44E8-AA51-E5CD1A036AB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87E36563-7067-44E8-AA51-E5CD1A036AB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87E36563-7067-44E8-AA51-E5CD1A036AB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87E36563-7067-44E8-AA51-E5CD1A036AB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F78C36-9B81-4F06-AD8A-5CC6D5F01B6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F78C36-9B81-4F06-AD8A-5CC6D5F01B6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F78C36-9B81-4F06-AD8A-5CC6D5F01B6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F78C36-9B81-4F06-AD8A-5CC6D5F01B6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EBCD670-04E4-4A7D-A75F-95A12CEDB323}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EBCD670-04E4-4A7D-A75F-95A12CEDB323}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EBCD670-04E4-4A7D-A75F-95A12CEDB323}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EBCD670-04E4-4A7D-A75F-95A12CEDB323}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
