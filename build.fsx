@@ -37,7 +37,7 @@ Target "AssemblyInfo" (fun _ ->
                                                                   Attribute.FileVersion version
                                                                   Attribute.InternalsVisibleTo "OCA.Assembler.Test" ])
 
-Target "BuildApp" (fun _ -> MSBuildRelease buildDir "Build" appProjects |> Log "AppBuild-Output: ")
+Target "BuildApp" (fun _ -> MSBuildRelease srcBuildDir "Build" appProjects |> Log "AppBuild-Output: ")
 Target "BuildTest" (fun _ -> MSBuildDebug testDir "Build" testProjects |> Log "TestBuild-Output: ")
 
 Target "Test" (fun _ -> 
@@ -46,7 +46,7 @@ Target "Test" (fun _ ->
                                            TimeOut = System.TimeSpan.FromMinutes 5.0
                                            Framework = "4.5"
                                            Domain = NUnitDomainModel.DefaultDomainModel
-                                           OutputFile = "TestResults.xml" }))
+                                           OutputFile = buildDir + "/TestResults.xml" }))
 
 Target "Deploy" (fun _ -> !!(srcBuildDir + "/**/*.*") -- "*.zip" |> Zip buildDir (outputDir + "/Assembler." + stringVersion + ".zip"))
 
