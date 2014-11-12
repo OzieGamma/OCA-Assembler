@@ -24,6 +24,7 @@ https://github.com/fsprojects/VisualFSharpPowerTools/blob/master/tests/FSharpVSP
 module TestHelpers
 
 open NUnit.Framework
+open OCA.AsmLib
 
 (* Fluent test helpers for use with NUnit and FsUnit. *)
 /// Asserts that two values are equal.
@@ -42,14 +43,10 @@ let inline shouldSame<'T when 'T : not struct> (expected : 'T) (actual : 'T) =
 let inline shouldNotSame<'T when 'T : not struct> (expected : 'T) (actual : 'T) =
     Assert.AreNotSame (expected, actual)
 
-/// Asserts that a condition is true.
-let inline shouldBeTrue condition =
-    Assert.IsTrue (condition)
-
-/// Asserts that a condition is false.
-let inline shouldBeFalse condition =
-    Assert.IsFalse (condition)
-
+let inline shouldFail (actual : Attempt<'T>) =
+    match actual with
+    | Ok _ -> Assert.Fail()
+    | Fail _ -> Assert.IsTrue(true)
 
 /// Assertion functions for collections.
 [<RequireQualifiedAccess>]
@@ -73,5 +70,3 @@ module Collection =
     /// Asserts that two collections are not exactly equal.
     let inline shouldNotEquiv<'T, 'U when 'T :> seq<'U>> (expected : 'T) (actual : 'T) =
         CollectionAssert.AreNotEquivalent (expected, actual)
-
-

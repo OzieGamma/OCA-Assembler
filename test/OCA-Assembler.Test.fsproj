@@ -69,6 +69,11 @@
   </Target>
   -->
   <ItemGroup>
+    <ProjectReference Include="..\..\OCA-AsmLib\src\OCA-AsmLib.fsproj">
+      <Name>OCA-AsmLib</Name>
+      <Project>{6ebcd670-04e4-4a7d-a75f-95a12cedb323}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\src\OCA-Assembler.csproj">
       <Name>OCA-Assembler</Name>
       <Project>{87e36563-7067-44e8-aa51-e5cd1a036ab8}</Project>

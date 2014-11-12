@@ -18,10 +18,19 @@
 
 namespace OCA.Assembler
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
+    using Microsoft.FSharp.Collections;
+
+    using OCA.AsmLib;
+
     /// <summary>
     ///     The program.
     /// </summary>
-    internal class Program
+    internal static class Program
     {
         /// <summary>
         /// The main.
@@ -31,17 +40,102 @@ namespace OCA.Assembler
         /// </param>
         internal static void Main(string[] args)
         {
+            if (args.Length == 0 || args[0] == "/help" || args.Length != 2)
+            {
+                Console.WriteLine("Usage: assembler.exe <in.asm> <out.hex>");
+            }
+            else if (!File.Exists(args[0]))
+            {
+                Console.WriteLine("Input file {0} does not exist", args[0]);
+            }
+            else
+            {
+                try
+                {
+                    string name = Path.GetDirectoryName(args[1]);
+                    if (name == null)
+                    {
+                        throw new IOException();
+                    }
+
+                    Directory.CreateDirectory(name);
+
+                    AssembleFile(args[0], args[1]);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Could not create directory for {0}", args[1]);
+                    Console.WriteLine(e.StackTrace);
+                }
+            }
+
+            Console.WriteLine("{0}Done ...", Environment.NewLine);
+            Console.Read();
         }
 
         /// <summary>
-        ///     The version.
+        /// Assembles a file and stores it's result in another file.
         /// </summary>
-        /// <returns>
-        ///     The <see cref="int" />.
-        /// </returns>
-        internal static int Version()
+        /// <param name="inputFile">
+        /// The input file.
+        /// </param>
+        /// <param name="outputFile">
+        /// The output file.
+        /// </param>
+        private static void AssembleFile(string inputFile, string outputFile)
         {
-            return 3;
+            string[] input = File.ReadAllLines(inputFile);
+
+            var withoutComments = RemoveCommentsAndTrim(input).ToFSharpList();
+            var result = Instr.parseSource(withoutComments);
+
+            if (result.IsOk)
+            {
+                foreach (var instr in ((Attempt<FSharpList<AsmInstr>>.Ok)result).Item)
+                {
+                    Console.WriteLine(instr);   
+                }
+            }
+            else
+            {
+                Console.WriteLine("Errors !!! {0}{0}", Environment.NewLine);
+
+                foreach (var error in ((Attempt<FSharpList<AsmInstr>>.Fail)result).Item)
+                {
+                    Console.WriteLine(error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes comments. (And trims)
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <returns>
+        /// The input without comments and trimmed.
+        /// </returns>
+        private static IEnumerable<string> RemoveCommentsAndTrim(IEnumerable<string> input)
+        {
+            return input.AsParallel().Select(_ => _.Trim()).Where(_ => !_.StartsWith("#"));
+        }
+
+        /// <summary>
+        /// Transforms an enumerable to an F# list.
+        /// </summary>
+        /// <param name="enumerable">
+        /// The enumerable.
+        /// </param>
+        /// <typeparam name="T">
+        /// The type of the enumerable.
+        /// </typeparam>
+        /// <returns>
+        /// The F# list.
+        /// </returns>
+        private static FSharpList<T> ToFSharpList<T>(this IEnumerable<T> enumerable)
+        {
+            return SeqModule.ToList(enumerable);
         }
     }
 }
