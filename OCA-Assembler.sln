@@ -19,6 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OCA-AsmLib", "..\OCA-AsmLib\src\OCA-AsmLib.fsproj", "{6EBCD670-04E4-4A7D-A75F-95A12CEDB323}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{84CFA351-77EB-4EFC-BE4F-7A0E508DFA90}"
+	ProjectSection(SolutionItems) = preProject
+		examples\add.asm = examples\add.asm
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,5 +45,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84CFA351-77EB-4EFC-BE4F-7A0E508DFA90} = {B96FECEE-353C-4138-937E-FA96D405B073}
 	EndGlobalSection
 EndGlobal

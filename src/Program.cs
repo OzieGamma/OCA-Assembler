@@ -87,7 +87,7 @@ namespace OCA.Assembler
             string[] input = File.ReadAllLines(inputFile);
 
             var withoutComments = RemoveCommentsAndTrim(input).ToFSharpList();
-            var result = Instr.parseSource(withoutComments);
+            var result = SourceModule.FromFriendly(withoutComments);
 
             if (result.IsOk)
             {
