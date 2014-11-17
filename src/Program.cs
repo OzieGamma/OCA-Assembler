@@ -91,16 +91,20 @@ namespace OCA.Assembler
 
             if (result.IsOk)
             {
-                foreach (var instr in ((Attempt<FSharpList<AsmInstr>>.Ok)result).Item)
+                var output = ((Attempt<FSharpList<AsmInstr>>.Ok)result).Item;
+
+                foreach (var instr in output)
                 {
                     Console.WriteLine(instr);   
                 }
             }
             else
             {
-                Console.WriteLine("Errors !!! {0}{0}", Environment.NewLine);
+                var errors = ((Attempt<FSharpList<AsmInstr>>.Fail)result).Item.ToList();
 
-                foreach (var error in ((Attempt<FSharpList<AsmInstr>>.Fail)result).Item)
+                Console.WriteLine("{0} Errors !!! {1}{1}", errors.Count, Environment.NewLine);
+
+                foreach (var error in errors)
                 {
                     Console.WriteLine(error);
                 }
@@ -118,7 +122,7 @@ namespace OCA.Assembler
         /// </returns>
         private static IEnumerable<string> RemoveCommentsAndTrim(IEnumerable<string> input)
         {
-            return input.AsParallel().Select(_ => _.Trim()).Where(_ => !_.StartsWith("#"));
+            return input.AsParallel().Select(_ => new string(_.Trim().TakeWhile(c => c != '#').ToArray())).Where(_ => _ != string.Empty);
         }
 
         /// <summary>

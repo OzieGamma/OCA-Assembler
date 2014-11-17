@@ -21,7 +21,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OCA-AsmLib", "..\OCA-AsmLib
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{84CFA351-77EB-4EFC-BE4F-7A0E508DFA90}"
 	ProjectSection(SolutionItems) = preProject
-		examples\add.asm = examples\add.asm
+		examples\test_1.asm = examples\test_1.asm
 	EndProjectSection
 EndProject
 Global
