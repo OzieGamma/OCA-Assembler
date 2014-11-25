@@ -40,106 +40,116 @@ namespace OCA.Assembler
         /// </param>
         internal static void Main(string[] args)
         {
-            if (args.Length == 0 || args[0] == "/help" || args.Length != 2)
+            AssemblerOptions options = ProccessArgs(args);
+
+            if (!options.IsValid)
             {
-                Console.WriteLine("Usage: assembler.exe <in.asm> <out.hex>");
-            }
-            else if (!File.Exists(args[0]))
-            {
-                Console.WriteLine("Input file {0} does not exist", args[0]);
+                DisplayUsage();
             }
             else
             {
                 try
                 {
-                    string name = Path.GetDirectoryName(args[1]);
-                    if (name == null)
-                    {
-                        throw new IOException();
-                    }
-
-                    Directory.CreateDirectory(name);
-
-                    AssembleFile(args[0], args[1]);
+                    Assembly.Assemble(options);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Could not create directory for {0}", args[1]);
+                    Console.WriteLine("Something went wrong: {0}", e);
                     Console.WriteLine(e.StackTrace);
                 }
             }
-
-            Console.WriteLine("{0}Done ...", Environment.NewLine);
-            Console.Read();
         }
 
         /// <summary>
-        /// Assembles a file and stores it's result in another file.
+        ///     The display usage.
         /// </summary>
-        /// <param name="inputFile">
-        /// The input file.
-        /// </param>
-        /// <param name="outputFile">
-        /// The output file.
-        /// </param>
-        private static void AssembleFile(string inputFile, string outputFile)
+        private static void DisplayUsage()
         {
-            string[] input = File.ReadAllLines(inputFile);
+            Console.WriteLine("Usage: assembler.exe [in-option] <infile1> [out-option] <outfile>");
+            Console.WriteLine("\tIn-Options:");
+            Console.WriteLine("\t\t-f --friendly Input is treated as friendly input files");
+            Console.WriteLine("\t\t-b --bin Input is treated as binary files");
 
-            var withoutComments = RemoveCommentsAndTrim(input).ToFSharpList();
-            var result = SourceModule.FromFriendly(withoutComments);
-
-            if (result.IsOk)
-            {
-                var output = ((Attempt<FSharpList<AsmInstr>>.Ok)result).Item;
-
-                foreach (var instr in output)
-                {
-                    Console.WriteLine(instr);   
-                }
-            }
-            else
-            {
-                var errors = ((Attempt<FSharpList<AsmInstr>>.Fail)result).Item.ToList();
-
-                Console.WriteLine("{0} Errors !!! {1}{1}", errors.Count, Environment.NewLine);
-
-                foreach (var error in errors)
-                {
-                    Console.WriteLine(error);
-                }
-            }
+            Console.WriteLine("\tOut-Options:");
+            Console.WriteLine("\t\t-f --friendly Outputs pretty printed text");
+            Console.WriteLine("\t\t-b --bin Outputs machine code");
+            Console.WriteLine("\t\t-i --intel Outputs machine code in intel hex format");
         }
 
         /// <summary>
-        /// Removes comments. (And trims)
+        /// Processes the arguments of the assembler.
         /// </summary>
-        /// <param name="input">
-        /// The input.
+        /// <param name="args">
+        /// The arguments.
         /// </param>
         /// <returns>
-        /// The input without comments and trimmed.
+        /// The <see cref="AssemblerOptions"/>.
         /// </returns>
-        private static IEnumerable<string> RemoveCommentsAndTrim(IEnumerable<string> input)
+        private static AssemblerOptions ProccessArgs(string[] args)
         {
-            return input.AsParallel().Select(_ => new string(_.Trim().TakeWhile(c => c != '#').ToArray())).Where(_ => _ != string.Empty);
+            if (args == null || args.Length != 4)
+            {
+                return new AssemblerOptions(
+                    AssemblerOptions.InputType.Invalid,
+                    AssemblerOptions.OutputType.Invalid,
+                    null,
+                    null);
+            }
+
+            return new AssemblerOptions(ProcessInputType(args[0]), ProcessOutputType(args[2]), args[1], args[3]);
         }
 
         /// <summary>
-        /// Transforms an enumerable to an F# list.
+        /// The process input type.
         /// </summary>
-        /// <param name="enumerable">
-        /// The enumerable.
+        /// <param name="arg">
+        /// The argument where the type should be.
         /// </param>
-        /// <typeparam name="T">
-        /// The type of the enumerable.
-        /// </typeparam>
         /// <returns>
-        /// The F# list.
+        /// The <see cref="AssemblerOptions.InputType"/>.
         /// </returns>
-        private static FSharpList<T> ToFSharpList<T>(this IEnumerable<T> enumerable)
+        private static AssemblerOptions.InputType ProcessInputType(string arg)
         {
-            return SeqModule.ToList(enumerable);
+            if (arg == "-f" || arg == "--friendly")
+            {
+                return AssemblerOptions.InputType.Friendly;
+            }
+
+            if (arg == "-b" || arg == "--bin")
+            {
+                return AssemblerOptions.InputType.Bin;
+            }
+
+            return AssemblerOptions.InputType.Invalid;
+        }
+
+        /// <summary>
+        /// The process output type.
+        /// </summary>
+        /// <param name="arg">
+        /// The argument where the type should be..
+        /// </param>
+        /// <returns>
+        /// The <see cref="AssemblerOptions.OutputType"/>.
+        /// </returns>
+        private static AssemblerOptions.OutputType ProcessOutputType(string arg)
+        {
+            if (arg == "-f" || arg == "--friendly")
+            {
+                return AssemblerOptions.OutputType.Friendly;
+            }
+
+            if (arg == "-b" || arg == "--bin")
+            {
+                return AssemblerOptions.OutputType.Bin;
+            }
+
+            if (arg == "-i" || arg == "--intel")
+            {
+                return AssemblerOptions.OutputType.Intel;
+            }
+
+            return AssemblerOptions.OutputType.Invalid;
         }
     }
 }
