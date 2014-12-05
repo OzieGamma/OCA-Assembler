@@ -59,19 +59,23 @@ namespace OCA.Assembler
         /// <typeparam name="T">
         /// The type of the attempt.
         /// </typeparam>
-        private static void TryContinue<T>(this Attempt<T> attempt, string phase, Action<T> f)
+        private static void TryContinue<T>(
+            this GenericAttempt<T, Positioned<string>> attempt, 
+            string phase, 
+            Action<T> f)
         {
             if (attempt.IsOk)
             {
-                f(((Attempt<T>.Ok)attempt).Item);
+                f(((GenericAttempt<T, Positioned<string>>.Ok)attempt).Item);
             }
             else
             {
-                List<string> errors = ((Attempt<T>.Fail)attempt).Item.ToList();
+                List<Positioned<string>> errors = ((GenericAttempt<T, Positioned<string>>.Fail)attempt).Item.ToList();
+                List<string> formatted = errors.Select(SourceModule.FormatPositionInError).ToList();
 
-                Console.WriteLine("{0} Errors during {1} phase !!! {2}{2}", errors.Count, phase, Environment.NewLine);
+                Console.WriteLine("{0} Errors during {1} phase !!! {2}{2}", formatted.Count, phase, Environment.NewLine);
 
-                foreach (string error in errors)
+                foreach (string error in formatted)
                 {
                     Console.WriteLine(error);
                 }
@@ -91,28 +95,39 @@ namespace OCA.Assembler
         /// The output file.
         /// </param>
         private static void To(
-            FSharpList<AsmInstr> instructions, 
+            IEnumerable<Positioned<AsmInstr>> instructions, 
             AssemblerOptions.OutputType outputType, 
             string outputFile)
         {
             switch (outputType)
             {
                 case AssemblerOptions.OutputType.Friendly:
-                    SourceModule.ToFriendly(instructions)
-                        .TryContinue("to", output => File.WriteAllLines(outputFile, output));
-                    break;
-                case AssemblerOptions.OutputType.Bin:
-                    SourceModule.ToBin(instructions).TryContinue(
+                    AssemblyModule.ToFriendly(instructions).TryContinue(
                         "to", 
                         output =>
                             {
-                                IEnumerable<byte> bytes = output.SelectMany(BitConverter.GetBytes);
+                                IEnumerable<string> strings = output.Select(PositionedModule.RemovePosition);
+                                File.WriteAllLines(outputFile, strings);
+                            });
+                    break;
+                case AssemblerOptions.OutputType.Bin:
+                    AssemblyModule.ToBin(instructions).TryContinue(
+                        "to", 
+                        output =>
+                            {
+                                IEnumerable<uint> notPositioned = output.Select(PositionedModule.RemovePosition);
+                                IEnumerable<byte> bytes = notPositioned.SelectMany(BitConverter.GetBytes);
                                 File.WriteAllBytes(outputFile, bytes.ToArray());
                             });
                     break;
                 case AssemblerOptions.OutputType.Intel:
-                    SourceModule.ToIntelHex(instructions)
-                        .TryContinue("to", output => File.WriteAllLines(outputFile, output));
+                    AssemblyModule.ToIntelHex(instructions).TryContinue(
+                        "to", 
+                        output =>
+                            {
+                                IEnumerable<string> strings = output.Select(PositionedModule.RemovePosition);
+                                File.WriteAllLines(outputFile, strings);
+                            });
                     break;
                 default:
                     throw new ArgumentException("Unknown output type" + outputType);
@@ -131,20 +146,25 @@ namespace OCA.Assembler
         /// <returns>
         /// The <see cref="Attempt"/>.
         /// </returns>
-        private static Attempt<FSharpList<AsmInstr>> From(AssemblerOptions.InputType inputType, string inputFile)
+        private static GenericAttempt<FSharpList<Positioned<AsmInstr>>, Positioned<string>> From(
+            AssemblerOptions.InputType inputType, 
+            string inputFile)
         {
             switch (inputType)
             {
                 case AssemblerOptions.InputType.Friendly:
-                    return SourceModule.FromFriendly(RemoveCommentsAndTrim(File.ReadAllLines(inputFile)).ToFSharpList());
+                    return
+                        AssemblyModule.FromFriendly(
+                            SourceModule.PositionRemoveCommentsAndTokenize(inputFile, File.ReadAllText(inputFile)));
 
                 case AssemblerOptions.InputType.Bin:
                     byte[] bytes = File.ReadAllBytes(inputFile);
                     if (bytes.Length % 4 != 0)
                     {
-                        return
-                            Attempt<FSharpList<AsmInstr>>.NewFail(
-                                new FSharpList<string>("Invalid binary file: " + inputType, FSharpList<string>.Empty));
+                        string msg = "Invalid binary file: " + inputType;
+                        var error = new Positioned<string>(msg, new Position(0, 0, inputFile));
+                        var errors = new FSharpList<Positioned<string>>(error, FSharpList<Positioned<string>>.Empty);
+                        return GenericAttempt<FSharpList<Positioned<AsmInstr>>, Positioned<string>>.NewFail(errors);
                     }
 
                     var words = new List<uint>();
@@ -153,45 +173,13 @@ namespace OCA.Assembler
                         words.Add(BitConverter.ToUInt32(bytes, i));
                     }
 
-                    return SourceModule.FromBin(words.ToFSharpList());
+                    return
+                        AssemblyModule.FromBin(
+                            words.Select((x, index) => new Positioned<uint>(x, new Position(0, (uint)index, inputFile))));
 
                 default:
                     throw new ArgumentException("Unknown input type" + inputType);
             }
-        }
-
-        /// <summary>
-        /// Removes comments. (And trims)
-        /// </summary>
-        /// <param name="input">
-        /// The input.
-        /// </param>
-        /// <returns>
-        /// The input without comments and trimmed.
-        /// </returns>
-        private static IEnumerable<string> RemoveCommentsAndTrim(IEnumerable<string> input)
-        {
-            return
-                input.Select(_ => new string(_.Trim().TakeWhile(c => c != '#').ToArray()))
-                    .Where(_ => _ != string.Empty)
-                    .ToList();
-        }
-
-        /// <summary>
-        /// Transforms an enumerable to an F# list.
-        /// </summary>
-        /// <param name="enumerable">
-        /// The enumerable.
-        /// </param>
-        /// <typeparam name="T">
-        /// The type of the enumerable.
-        /// </typeparam>
-        /// <returns>
-        /// The F# list.
-        /// </returns>
-        private static FSharpList<T> ToFSharpList<T>(this IEnumerable<T> enumerable)
-        {
-            return SeqModule.ToList(enumerable);
         }
     }
 }

@@ -19,13 +19,6 @@
 namespace OCA.Assembler
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-
-    using Microsoft.FSharp.Collections;
-
-    using OCA.AsmLib;
 
     /// <summary>
     ///     The program.

@@ -8,13 +8,13 @@ FAIL:
 	br FAIL
 	
 test_1:
-	set s0, 42
-	set s1, 2
+	addi s0, zero, 42
+	addi s1, zero, 2
 	
 	calli int_mul
 	
 	#Expected = 42 * 2
-	set s2, 84
+	addi s2, zero, 84
 	
 	sub t0, t0, s2
 	bnez t0, FAIL
