@@ -63,7 +63,11 @@ namespace OCA.Assembler
                 }
                 else
                 {
-                    Directory.CreateDirectory(dirName);
+                    if (dirName != string.Empty)
+                    {
+                        Directory.CreateDirectory(dirName);
+                    }
+
                     this.IsValid = true;
                 }
             }

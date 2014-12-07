@@ -61,8 +61,8 @@ namespace OCA.Assembler
         /// The type of the attempt.
         /// </typeparam>
         private static void TryContinue<T>(
-            this GenericAttempt<T, Positioned<string>> attempt, 
-            string phase, 
+            this GenericAttempt<T, Positioned<string>> attempt,
+            string phase,
             Action<T> f)
         {
             if (attempt.IsOk)
@@ -96,39 +96,45 @@ namespace OCA.Assembler
         /// The output file.
         /// </param>
         private static void To(
-            IEnumerable<Positioned<AsmInstr>> instructions, 
-            AssemblerOptions.OutputType outputType, 
+            IEnumerable<Positioned<AsmInstr>> instructions,
+            AssemblerOptions.OutputType outputType,
             string outputFile)
         {
             switch (outputType)
             {
                 case AssemblerOptions.OutputType.Friendly:
                     Time("to", () => AssemblyModule.ToFriendly(instructions)).TryContinue(
-                        "to", 
+                        "to",
                         output =>
-                            {
-                                IEnumerable<string> strings = output.Select(PositionedModule.RemovePosition);
-                                File.WriteAllLines(outputFile, strings);
-                            });
+                        {
+                            IEnumerable<string> strings = output.Select(PositionedModule.RemovePosition);
+                            File.WriteAllLines(outputFile, strings);
+                        });
                     break;
                 case AssemblerOptions.OutputType.Bin:
                     Time("to", () => AssemblyModule.ToBin(instructions)).TryContinue(
-                        "to", 
+                        "to",
                         output =>
-                            {
-                                IEnumerable<uint> notPositioned = output.Select(PositionedModule.RemovePosition);
-                                IEnumerable<byte> bytes = notPositioned.SelectMany(BitConverter.GetBytes);
-                                File.WriteAllBytes(outputFile, bytes.ToArray());
-                            });
+                        {
+                            List<uint> notPositioned = output.Select(PositionedModule.RemovePosition).ToList();
+
+                            Console.WriteLine("Binary file size: {0} words", notPositioned.Count);
+
+                            IEnumerable<byte> bytes = notPositioned.SelectMany(BitConverter.GetBytes);
+                            File.WriteAllBytes(outputFile, bytes.ToArray());
+                        });
                     break;
                 case AssemblerOptions.OutputType.Intel:
                     Time("to", () => AssemblyModule.ToIntelHex(instructions)).TryContinue(
-                        "to", 
+                        "to",
                         output =>
-                            {
-                                IEnumerable<string> strings = output.Select(PositionedModule.RemovePosition);
-                                File.WriteAllLines(outputFile, strings);
-                            });
+                        {
+                            var strings = output.Select(PositionedModule.RemovePosition).ToList();
+
+                            Console.WriteLine("Binary file size: {0} words", strings.Count - 1);
+
+                            File.WriteAllLines(outputFile, strings);
+                        });
                     break;
                 default:
                     throw new ArgumentException("Unknown output type" + outputType);
@@ -148,7 +154,7 @@ namespace OCA.Assembler
         /// The <see cref="Attempt"/>.
         /// </returns>
         private static GenericAttempt<FSharpList<Positioned<AsmInstr>>, Positioned<string>> From(
-            AssemblerOptions.InputType inputType, 
+            AssemblerOptions.InputType inputType,
             string inputFile)
         {
             switch (inputType)
