@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCA-Assembler", "src\OCA-Assembler.csproj", "{87E36563-7067-44E8-AA51-E5CD1A036AB8}"
 EndProject
@@ -21,7 +21,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OCA-AsmLib", "..\OCA-AsmLib
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{84CFA351-77EB-4EFC-BE4F-7A0E508DFA90}"
 	ProjectSection(SolutionItems) = preProject
-		examples\test_1.asm = examples\test_1.asm
+		..\OCA-VirtualMachine\examples\test.asm = ..\OCA-VirtualMachine\examples\test.asm
 	EndProjectSection
 EndProject
 Global
@@ -48,5 +48,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{84CFA351-77EB-4EFC-BE4F-7A0E508DFA90} = {B96FECEE-353C-4138-937E-FA96D405B073}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

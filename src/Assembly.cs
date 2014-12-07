@@ -20,6 +20,7 @@ namespace OCA.Assembler
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
@@ -40,8 +41,8 @@ namespace OCA.Assembler
         /// </param>
         public static void Assemble(AssemblerOptions options)
         {
-            From(options.InType, options.InputFile)
-                .TryContinue("from", instructions => To(instructions, options.OutType, options.OutputFile));
+            Time("From", () => From(options.InType, options.InputFile))
+                    .TryContinue("from", instructions => To(instructions, options.OutType, options.OutputFile));
         }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace OCA.Assembler
             switch (outputType)
             {
                 case AssemblerOptions.OutputType.Friendly:
-                    AssemblyModule.ToFriendly(instructions).TryContinue(
+                    Time("to", () => AssemblyModule.ToFriendly(instructions)).TryContinue(
                         "to", 
                         output =>
                             {
@@ -111,7 +112,7 @@ namespace OCA.Assembler
                             });
                     break;
                 case AssemblerOptions.OutputType.Bin:
-                    AssemblyModule.ToBin(instructions).TryContinue(
+                    Time("to", () => AssemblyModule.ToBin(instructions)).TryContinue(
                         "to", 
                         output =>
                             {
@@ -121,7 +122,7 @@ namespace OCA.Assembler
                             });
                     break;
                 case AssemblerOptions.OutputType.Intel:
-                    AssemblyModule.ToIntelHex(instructions).TryContinue(
+                    Time("to", () => AssemblyModule.ToIntelHex(instructions)).TryContinue(
                         "to", 
                         output =>
                             {
@@ -180,6 +181,36 @@ namespace OCA.Assembler
                 default:
                     throw new ArgumentException("Unknown input type" + inputType);
             }
+        }
+
+        /// <summary>
+        /// Times a function.
+        /// </summary>
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="f">
+        /// The function.
+        /// </param>
+        /// <typeparam name="T">
+        /// The return type of f.
+        /// </typeparam>
+        /// <returns>
+        /// The return value of f.
+        /// </returns>
+        private static T Time<T>(string name, Func<T> f)
+        {
+            Console.WriteLine("Starting {0}", name);
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var ret = f();
+
+            timer.Stop();
+            Console.WriteLine("Finished {0}, elapsed time {1}", name, arg1: timer.Elapsed);
+
+            return ret;
         }
     }
 }
