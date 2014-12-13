@@ -1,4 +1,4 @@
-﻿module OCA.AsmLib.DummyTest
+﻿module OCA.VirtualMachine.DummyTest
 
 open NUnit.Framework
 

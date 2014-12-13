@@ -5,13 +5,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>f8f78c36-9b81-4f06-ad8a-5cc6d5f01b6f</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>OCA.Assembler.Test</RootNamespace>
-    <AssemblyName>OCA.Assembler.Test</AssemblyName>
+    <ProjectGuid>57b5e3ee-68de-4ebe-85fb-005987ff7f27</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OCA.Assembler</RootNamespace>
+    <AssemblyName>OCA.Assembler</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
-    <Name>OCA-Assembler.Test</Name>
+    <Name>OCA-Assembler</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +22,11 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\OCA.Assembler.Test.XML</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Debug\OCA.Assembler.XML</DocumentationFile>
+    <Prefer32Bit>true</Prefer32Bit>
+    <StartWorkingDirectory>C:\Users\Oswald\Documents\GitHub\OCA-VirtualMachine\examples\</StartWorkingDirectory>
+    <StartArguments>-f test.asm -b test.bin</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,15 +35,12 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\OCA.Assembler.Test.XML</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Release\OCA.Assembler.XML</DocumentationFile>
+    <Prefer32Bit>true</Prefer32Bit>
+    <StartWorkingDirectory>C:\Users\Oswald\Documents\GitHub\OCA-Assembler\examples\</StartWorkingDirectory>
+    <StartArguments>.\test.asm</StartArguments>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-      <Paket>True</Paket>
-    </Reference>
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -49,8 +51,15 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestHelpers.fs" />
-    <Compile Include="DummyTest.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OCA-AsmLib\src\OCA-AsmLib.fsproj">
+      <Name>OCA-AsmLib</Name>
+      <Project>{6ebcd670-04e4-4a7d-a75f-95a12cedb323}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -75,11 +84,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <ProjectReference Include="..\..\OCA-AsmLib\src\OCA-AsmLib.fsproj">
-      <Name>OCA-AsmLib</Name>
-      <Project>{6ebcd670-04e4-4a7d-a75f-95a12cedb323}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

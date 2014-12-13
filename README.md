@@ -1,8 +1,4 @@
-OCA-Assembler
-=============
+OCA-VirtualMachine
+==================
 
-An assembler for OCA.
-
-
-# See
-https://github.com/OzieGamma/OCA-specifications
+A virtual machine for OCA (OzieGamma's Computing architecture) written in C# and F#
